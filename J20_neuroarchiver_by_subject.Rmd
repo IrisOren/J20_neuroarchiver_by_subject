@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r initialisation, include=FALSE}
 AnimalIDCurrent<-"JF110"
-DataFile<-"../../J20_EEG_Manuscript/Output/SCPPDataframeAll.csv"
+DataFile<-"~/Dropbox/ANALYSIS/J20_EEG_Manuscript/Output/SCPPDataframeAll.csv"
 
 #Load packages
 library(lubridate)
@@ -22,19 +22,23 @@ library(grid)
 
 #Import data and filter for animal
 Dataframe<-read.csv(DataFile)
-Dataframe<-filter(Dataframe, AnimalID=AnimalIDCurrent)
+Dataframe<-filter(Dataframe, AnimalIDVariable==AnimalIDCurrent)
 ```
 
 #`r AnimalIDCurrent`
 
-##Dataloss over time
+###Dataloss over time
 ```{r DatalossOverTime, include=TRUE}
-DataLossOverTime<-gglot(Dataframe, aes(x=InitialisedTime, y=Loss))
+DataLossOverTime<-ggplot(Dataframe, aes(x=InitialisedTime, y=Loss))
 DataLossOverTime<-DataLossOverTime + geom_point() +
-  geom_hline(yintercept = 0.2)
+  geom_hline(yintercept = 20)
+DataLossOverTime
 ```
 
-##Spike count over time
-```{r SpikeCountOverTime, include=TRUE}
-SpikeCountOverTime<-gglot(Dataframe, aes(x=InitialisedTime, y=SpikeCount))
+###Spike count over time
+
+```{r SpikeCountOverTimeControl, include=TRUE}
+SpikeCountOverTime<-ggplot(Dataframe, aes(x=InitialisedTime, y=SpikeCount, colour=Treatment)) + ylab("Spikes/8s")
 SpikeCountOverTime<-SpikeCountOverTime + geom_point()
+SpikeCountOverTime
+```
