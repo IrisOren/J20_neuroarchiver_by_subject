@@ -1,0 +1,40 @@
+---
+title: "J20 by subject analysis"
+author: "Iris Oren"
+date: "14/06/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r initialisation, include=FALSE}
+AnimalIDCurrent<-"JF110"
+DataFile<-"../../J20_EEG_Manuscript/SCPPDataframeAll.csv"
+
+#Load packages
+library(lubridate)
+library(dplyr)
+library(lazyeval) #Needed for using ggplot2 library
+library(ggplot2)
+library(grid)
+
+#Import data and filter for animal
+Dataframe<-read.csv(DataFile)
+Dataframe<-filter(Dataframe, AnimalID=AnimalIDCurrent)
+```
+
+#`r AnimalIDCurrent`
+
+##Dataloss over time
+```{r DatalossOverTime, include=TRUE}
+DataLossOverTime<-gglot(Dataframe, aes(x=InitialisedTime, y=Loss))
+DataLossOverTime<-DataLossOverTime + geom_point() +
+  geom_hline(yintercept = 0.2)
+```
+
+##Spike count over time
+```{r SpikeCountOverTime, include=TRUE}
+SpikeCountOverTime<-gglot(Dataframe, aes(x=InitialisedTime, y=SpikeCount))
+SpikeCountOverTime<-SpikeCountOverTime + geom_point()
