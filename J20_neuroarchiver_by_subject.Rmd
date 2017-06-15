@@ -11,7 +11,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r initialisation, include=TRUE, echo = FALSE}
 AnimalIDCurrent<-"JF110"
-DataFile<-"~/Dropbox/ANALYSIS/J20_EEG_Manuscript/Output/SCPPDataframeAll.csv"
+SpikesPCAFilename<-"~/Dropbox/ANALYSIS/Neuroarchiver/J20EEG/SpikeDetectionMatthias/JF110/DataJF110/E6_detected_spikes_clustered.txt"
+ClustersToInclude<-c(0,4)  #Specify which clusters to include based on jupyter notebook classifiy_spikes_and_saveCalcClusters.ipynb
+TimeZone<-"Europe/london"
+
 
 #Load packages
 library(lubridate)
@@ -65,8 +68,8 @@ DataframeSelect<-select(DataframeControl, SpikeCount, HourOfEvent)
 for(Hour in 0:23){
   DataframeTemp<-filter(DataframeSelect, HourOfEvent==Hour)
   TotalSpikeCount<-sum(DataframeTemp$SpikeCount)
-  TotalHours<-nrow(DataframeTemp)
-  TempDF<-data.frame(SpikeCount=TotalSpikeCount/TotalHours, HourBin=Hour+0.5)
+  Total8sIntervals<-nrow(DataframeTemp)
+  TempDF<-data.frame(SpikeCount=TotalSpikeCount/Total8sIntervals*8, HourBin=Hour+0.5)
   SpikeCountHistDF<-rbind(SpikeCountHistDF, TempDF)
 }
 
@@ -75,9 +78,54 @@ SpikeCountHistDF$Light<-SpikeCountHistDF$HourBin %in% seq(7.5, 18.5)
 SpikeCountHist<-ggplot(SpikeCountHistDF, aes(x=HourBin, y=SpikeCount, fill=Light)) + geom_bar(stat = "identity")
 SpikeCountHist <- SpikeCountHist +
             xlab("Hour") +
-            ylab("Spike probability") +
+            ylab("Spikes per second") +
             scale_x_continuous(limits = c(0,24), expand = c(0,0), breaks = seq(0, 23, 2)) +
             scale_fill_grey(labels=c("Off", "On")) +
             coord_polar(start = 0) 
 SpikeCountHist
+```
+###Polar plotting of spikes identified by PCA analysis
+Here, we use the output from the jupyter notebook for plotting circular plots and calculating phase coupling. This analysis does not take into account the length of the recording
+```{r PolarPCAHist, include=TRUE, echo=FALSE}
+SpikesPCA<-read.csv(SpikesPCAFilename, header=FALSE, sep=" ")
+sps=512
+names(SpikesPCA)[1]<-"SampleNumber"
+names(SpikesPCA)[2]<-"Cluster"
+SpikesPCA$Seconds<-(SpikesPCA$SampleNumber)/sps
+
+#Initialise recording time from start of first data file in processor output file
+SpikesPCA$Initialised<-SpikesPCA$Seconds+Dataframe$InitialisedTime[1]
+
+#Convert to time of day and hour
+SpikesPCA$TimeOfDay<-as.POSIXct(SpikesPCA$Initialised, tz=TimeZone, origin="1970-01-01")
+SpikesPCA$HourOfEvent <- hour(SpikesPCA$TimeOfDay)
+
+#Select clusters of interest
+SpikesPCA<-SpikesPCA[which(SpikesPCA$Cluster %in% ClustersToInclude),]
+
+#Add variable for light
+SpikesPCA$Light <- SpikesPCA$HourOfEvent %in% seq(7,18)
+
+#Shift hour by 0.5
+SpikesPCA$HourOfEventShifted<-SpikesPCA$HourOfEvent+0.5
+
+#Plot
+fontsize=12
+
+SpikesPCAHist <- ggplot(SpikesPCA,
+                        aes(x = HourOfEventShifted, fill = Light)) +
+  geom_histogram(breaks = seq(0,   24), binwidth = 2, colour = "grey") + 
+  coord_polar(start = 0) + 
+  theme_minimal() + 
+  scale_fill_grey(labels=c("Off", "On")) + 
+  ylab("Count") + 
+  ggtitle("IIS by Time of day") + 
+  theme(plot.title = element_text (size = fontsize))+
+  theme(axis.title.y=element_text (size = fontsize))+
+  theme(axis.text.y =element_text (size = fontsize))+
+  theme(axis.text.x =element_text (size = fontsize))+
+  scale_x_continuous("", limits = c(0, 24), breaks = seq(0, 24), labels = seq(0,24))
+
+SpikesPCAHist
+
 ```
