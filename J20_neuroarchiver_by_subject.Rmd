@@ -29,7 +29,7 @@ Dataframe<-filter(Dataframe, AnimalIDVariable==AnimalIDCurrent)
 
 ###Dataloss over time
 ```{r DatalossOverTime, include=TRUE}
-DataLossOverTime<-ggplot(Dataframe, aes(x=InitialisedTime, y=Loss))
+DataLossOverTime<-ggplot(Dataframe, aes(x=strptime(TimeOfDay, format = "%Y-%m-%d %H:%M:%S"), y=Loss)) + xlab("Date") + ylab("Loss")
 DataLossOverTime<-DataLossOverTime + geom_point() +
   geom_hline(yintercept = 20)
 DataLossOverTime
@@ -38,7 +38,7 @@ DataLossOverTime
 ###Spike count over time
 
 ```{r SpikeCountOverTimeControl, include=TRUE}
-SpikeCountOverTime<-ggplot(Dataframe, aes(x=InitialisedTime, y=SpikeCount, colour=Treatment)) + ylab("Spikes/8s")
+SpikeCountOverTime<-ggplot(Dataframe, aes(x=strptime(TimeOfDay, format = "%Y-%m-%d %H:%M:%S"), y=SpikeCount, colour=Treatment)) + xlab("Date") + ylab("Spikes/8s")
 SpikeCountOverTime<-SpikeCountOverTime + geom_point()
 SpikeCountOverTime
 ```
