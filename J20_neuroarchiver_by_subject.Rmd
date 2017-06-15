@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r initialisation, include=FALSE}
+```{r initialisation, include=TRUE, echo = FALSE}
 AnimalIDCurrent<-"JF110"
 DataFile<-"~/Dropbox/ANALYSIS/J20_EEG_Manuscript/Output/SCPPDataframeAll.csv"
 
@@ -28,27 +28,30 @@ Dataframe<-filter(Dataframe, AnimalIDVariable==AnimalIDCurrent)
 #`r AnimalIDCurrent`
 
 ###Dataloss over time
-```{r DatalossOverTime, include=TRUE}
+```{r DatalossOverTime, include=TRUE, echo = FALSE}
 DataLossOverTime<-ggplot(Dataframe, aes(x=strptime(TimeOfDay, format = "%Y-%m-%d %H:%M:%S"), y=Loss)) + xlab("Date") + ylab("Loss")
 DataLossOverTime<-DataLossOverTime + geom_point() +
   geom_hline(yintercept = 20)
 DataLossOverTime
 ```
+
 ###Filter out loss intervals
 This accounts for when transmitter was switched off
-```{r FilterOutLoss, include = TRUE}
-Dataframe<-filter(Dataframe, Loss<90)
+```{r FilterOutLoss, include = TRUE, echo = FALSE}
+LossThresholdForFiltering=90
+Dataframe<-filter(Dataframe, Loss<LossThresholdForFiltering)
 ```
 
 ###Spike count over time
 
-```{r SpikeCountOverTimeControl, include=TRUE}
+```{r SpikeCountOverTimeControl, include=TRUE, echo = FALSE}
 SpikeCountOverTime<-ggplot(Dataframe, aes(x=strptime(TimeOfDay, format = "%Y-%m-%d %H:%M:%S"), y=SpikeCount, colour=Treatment)) + xlab("Date") + ylab("Spikes/8s")
 SpikeCountOverTime<-SpikeCountOverTime + geom_point()
 SpikeCountOverTime
 ```
+
 ###Polar histogram of IIS from neuroarchiver in control condition
-```{r PolarHistogram, include=FALSE}
+```{r PolarHistogram, include=TRUE, echo = FALSE}
 DataframeControl<-filter(Dataframe, Treatment=="Control")
 #Manually make new dataframe for histogram plotting. Intialise
 SpikeCountHistDF<-data.frame(SpikeCount=double(), HourBin=integer())
@@ -67,11 +70,14 @@ for(Hour in 0:23){
   SpikeCountHistDF<-rbind(SpikeCountHistDF, TempDF)
 }
 
-SpikeCountHist<-ggplot(SpikeCountHistDF, aes(x=HourBin, y=SpikeCount))+geom_bar(stat = "identity")
-SpikeCountHist<-SpikeCountHist +
-  xlab("Hour") +
-  ylab("Spike probability") +
-  scale_x_continuous(limits = c(0,24), expand = c(0,0), breaks = seq(0, 23, 2)) +
-  coord_polar(start = 0) 
+SpikeCountHistDF$Light<-SpikeCountHistDF$HourBin %in% seq(7.5, 18.5)
+
+SpikeCountHist<-ggplot(SpikeCountHistDF, aes(x=HourBin, y=SpikeCount, fill=Light)) + geom_bar(stat = "identity")
+SpikeCountHist <- SpikeCountHist +
+            xlab("Hour") +
+            ylab("Spike probability") +
+            scale_x_continuous(limits = c(0,24), expand = c(0,0), breaks = seq(0, 23, 2)) +
+            scale_fill_grey(labels=c("Off", "On")) +
+            coord_polar(start = 0) 
 SpikeCountHist
 ```
