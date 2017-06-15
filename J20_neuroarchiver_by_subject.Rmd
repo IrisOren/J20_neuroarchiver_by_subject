@@ -47,3 +47,31 @@ SpikeCountOverTime<-ggplot(Dataframe, aes(x=strptime(TimeOfDay, format = "%Y-%m-
 SpikeCountOverTime<-SpikeCountOverTime + geom_point()
 SpikeCountOverTime
 ```
+###Polar histogram of IIS from neuroarchiver in control condition
+```{r PolarHistogram, include=FALSE}
+DataframeControl<-filter(Dataframe, Treatment=="Control")
+#Manually make new dataframe for histogram plotting. Intialise
+SpikeCountHistDF<-data.frame(SpikeCount=double(), HourBin=integer())
+#First get the hour of each interval in the dataframe
+
+DataframeControl$TimeOfDay<-strptime(DataframeControl$TimeOfDay, "%Y-%m-%d %H:%M:%S")
+
+DataframeControl$HourOfEvent <- hour(DataframeControl$TimeOfDay)
+
+DataframeSelect<-select(DataframeControl, SpikeCount, HourOfEvent)
+for(Hour in 0:23){
+  DataframeTemp<-filter(DataframeSelect, HourOfEvent==Hour)
+  TotalSpikeCount<-sum(DataframeTemp$SpikeCount)
+  TotalHours<-nrow(DataframeTemp)
+  TempDF<-data.frame(SpikeCount=TotalSpikeCount/TotalHours, HourBin=Hour+0.5)
+  SpikeCountHistDF<-rbind(SpikeCountHistDF, TempDF)
+}
+
+SpikeCountHist<-ggplot(SpikeCountHistDF, aes(x=HourBin, y=SpikeCount))+geom_bar(stat = "identity")
+SpikeCountHist<-SpikeCountHist +
+  xlab("Hour") +
+  ylab("Spike probability") +
+  scale_x_continuous(limits = c(0,24), expand = c(0,0), breaks = seq(0, 23, 2)) +
+  coord_polar(start = 0) 
+SpikeCountHist
+```
