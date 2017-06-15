@@ -34,6 +34,11 @@ DataLossOverTime<-DataLossOverTime + geom_point() +
   geom_hline(yintercept = 20)
 DataLossOverTime
 ```
+###Filter out loss intervals
+This accounts for when transmitter was switched off
+```{r FilterOutLoss, include = TRUE}
+Dataframe<-filter(Dataframe, Loss<90)
+```
 
 ###Spike count over time
 
