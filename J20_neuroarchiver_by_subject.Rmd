@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r initialisation, include=TRUE, echo = FALSE}
 AnimalIDCurrent<-"JF110"
+DataFile<-"~/Dropbox/ANALYSIS/J20_EEG_Manuscript/Output/SCPPDataframeAll.csv" #Ouput of J20_EEG_Manuscript.Rmd
 SpikesPCAFilename<-"~/Dropbox/ANALYSIS/Neuroarchiver/J20EEG/SpikeDetectionMatthias/JF110/DataJF110/E6_detected_spikes_clustered.txt"
 ClustersToInclude<-c(0,4)  #Specify which clusters to include based on jupyter notebook classifiy_spikes_and_saveCalcClusters.ipynb
 TimeZone<-"Europe/london"
@@ -84,7 +85,9 @@ SpikeCountHist <- SpikeCountHist +
             coord_polar(start = 0) 
 SpikeCountHist
 ```
+
 ###Polar plotting of spikes identified by PCA analysis
+
 Here, we use the output from the jupyter notebook for plotting circular plots and calculating phase coupling. This analysis does not take into account the length of the recording
 ```{r PolarPCAHist, include=TRUE, echo=FALSE}
 SpikesPCA<-read.csv(SpikesPCAFilename, header=FALSE, sep=" ")
