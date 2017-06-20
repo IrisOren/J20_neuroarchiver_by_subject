@@ -38,6 +38,27 @@ DataLossOverTime<-DataLossOverTime + geom_point() +
   geom_hline(yintercept = 20)
 DataLossOverTime
 ```
+```{r LossQuantilesECDF, include = TRUE}
+#OPTIONAL: manually select dataframe rows when transmitter was on for quantifying the loss of the transmitter. This is determined from the Loss vs Time plot
+TransmitterOffTime<-Dataframe$InitialisedTime[1]
+TransmitterOnTime<-Dataframe$InitialisedTime[2]
+DataframeOn<-filter(Dataframe, InitialisedTime<TransmitterOffTime | InitialisedTime>TransmitterOnTime)
+
+#OR
+#DataframeOn<-Dataframe
+############
+
+LossECDF<-ecdf(DataframeOn$Loss)
+plot(LossECDF, xlab="Loss %", main="ECDF Loss")
+QuantileDivisions<-seq(0, 1, 0.05)
+LossQuantiles<-quantile(Dataframe$Loss, QuantileDivisions)
+LossIntervalIndex<-which(LossQuantiles>20)[1]  #Index for quantile where loss exceeds 20%
+LossIntervalPercentage<-LossQuantiles[LossIntervalIndex]
+
+```
+
+For periods when the transmitter was on, `r LossIntervalPercentage` intervals had loss <20%
+
 
 ###Filter out loss intervals
 This accounts for when transmitter was switched off
