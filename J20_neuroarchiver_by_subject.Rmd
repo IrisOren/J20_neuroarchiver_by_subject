@@ -52,8 +52,8 @@ LossECDF<-ecdf(DataframeOn$Loss)
 plot(LossECDF, xlab="Loss %", main="ECDF Loss")
 QuantileDivisions<-seq(0, 1, 0.05)
 LossQuantiles<-quantile(Dataframe$Loss, QuantileDivisions)
-LossIntervalIndex<-which(LossQuantiles>20)[1]  #Index for quantile where loss exceeds 20%
-LossIntervalPercentage<-LossQuantiles[LossIntervalIndex]
+NumberLossIntervals<-length(which(DataframeOn$Loss>20))
+LossIntervalPercentage<-NumberLossIntervals/nrow(DataframeOn)*100
 
 ```
 
