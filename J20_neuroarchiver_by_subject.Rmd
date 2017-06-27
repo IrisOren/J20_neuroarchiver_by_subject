@@ -61,23 +61,24 @@ For periods when the transmitter was on, `r LossIntervalPercentage` intervals ha
 
 
 ###Filter out loss intervals
-This accounts for when transmitter was switched off
+This accounts for when transmitter was switched off/lossy and artifacts
 ```{r FilterOutLoss, include = TRUE, echo = FALSE}
-LossThresholdForFiltering=90
-Dataframe<-filter(Dataframe, Loss<LossThresholdForFiltering)
+LossThresholdForFiltering=20
+DataframeNoLoss<-filter(Dataframe, Loss<LossThresholdForFiltering)
+DataframeNoLoss<-filter(DataframeNoLoss, Delta<1000)
 ```
 
 ###Spike count over time
 
 ```{r SpikeCountOverTimeControl, include=TRUE, echo = FALSE}
-SpikeCountOverTime<-ggplot(Dataframe, aes(x=strptime(TimeOfDay, format = "%Y-%m-%d %H:%M:%S"), y=SpikeCount, colour=Treatment)) + xlab("Date") + ylab("Spikes/8s")
+SpikeCountOverTime<-ggplot(DataframeNoLoss, aes(x=strptime(TimeOfDay, format = "%Y-%m-%d %H:%M:%S"), y=SpikeCount, colour=Treatment)) + xlab("Date") + ylab("Spikes/8s")
 SpikeCountOverTime<-SpikeCountOverTime + geom_point()
 SpikeCountOverTime
 ```
 
 ###Polar histogram of IIS from neuroarchiver in control condition
 ```{r PolarHistogram, include=TRUE, echo = FALSE}
-DataframeControl<-filter(Dataframe, Treatment=="Control")
+DataframeControl<-filter(DataframeNoLoss, Treatment=="Control")
 #Manually make new dataframe for histogram plotting. Intialise
 SpikeCountHistDF<-data.frame(SpikeCount=double(), HourBin=integer())
 #First get the hour of each interval in the dataframe
@@ -151,5 +152,12 @@ SpikesPCAHist <- ggplot(SpikesPCA,
   scale_x_continuous("", limits = c(0, 24), breaks = seq(0, 24), labels = seq(0,24))
 
 SpikesPCAHist
+
+```
+
+###Theta/delta and spikes
+For animals with cerebellar reference, we can relate the theta/delta ratio to spikes. Set include=TRUE for animals with cerebellar reference, else include = FALSE.
+```{r ThetaOverDeltaRaw, include=FALSE, echo=FALSE}
+
 
 ```
