@@ -163,7 +163,7 @@ SpikesPCAHist
 
 ###Theta/delta and spikes in control conditions
 For animals with cerebellar reference, we can relate the theta/delta ratio to spikes. 
-```{r ThetaOverDeltaRaw, include=FALSE, echo=FALSE}
+```{r ThetaOverDeltaRawPlot, include=FALSE, echo=FALSE}
 AllNDFs_Control<-as.character(unique(DataframeControl$FileName)) 
 if(Reference=="CTX"){
   print("Cortical reference so no subthreshold parameters evaluated")
