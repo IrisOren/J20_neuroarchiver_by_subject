@@ -254,3 +254,14 @@ while (i <= num_files_to_plot ){
 }
 
 ```
+
+We plot summary data of theta/delta as a function of spike number
+```{r ThetaOverDeltaBySpikeNumber, include = TRUE, echo=FALSE}
+if(Reference=="CTX"){
+  print("Cortical reference so no subthreshold parameters evaluated")
+}else{
+  SpikeCountPlot<-ggplot(DataframeControl, aes(x=SpikeCount,
+                                               y=ThetaOverDelta))+geom_point()
+  SpikeCountPlot
+}
+```
