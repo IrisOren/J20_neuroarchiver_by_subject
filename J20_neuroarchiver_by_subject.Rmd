@@ -88,9 +88,10 @@ SpikeCountOverTime
 Binning SpikeCount by hour
 
 ```{r BinnedSpikeCountByHour, include=TRUE, echo=FALSE}
-IntervalLength=8  #8s intervals analysed in neuroarchiver
+IntervalLength=8 #8s intervals analysed in neuroarchiver
+BinLength=3600  #Length of bin in seconds
+#First, create vector for spikes where excluded intervals are replaced with NA
 SpikeCountToInclude<-c()
-#SpikeCountToInclude<-SpikeCountToInclude[!is.na(SpikeCountToInclude)]
 for(i in 1:nrow(Dataframe)){
     if(Dataframe$ExcludeInterval[i]==1){
       SpikeCountToInclude[i]=NA
@@ -98,16 +99,21 @@ for(i in 1:nrow(Dataframe)){
       SpikeCountToInclude[i]=Dataframe$SpikeCount[i]
     }
 }
+#Create SpikePerSec which scales the spike count by interval length
 SpikePerSec<-SpikeCountToInclude/IntervalLength  #Spike count in interval
+
+#Create vectors for binned time, spikes and SEM
 BinnedSpikePerSec<-c()
 TimeOfBin<-c()
 SEMBinnedSpikePerSec<-c()
 j<-1
-for(i in 0:round(nrow(Dataframe)/450)){
-  BinnedSpikePerSec[j]<-mean(SpikePerSec[(i*450)+1:((i+1)*450)], na.rm=TRUE)
-  SEMBinnedSpikePerSec[j]<-sd(SpikePerSec[(i*450)+1:((i+1)*450)],na.rm=TRUE)/sqrt(450)
-  TimeOfBin[j]<-Dataframe$TimeOfDay[(i+0.5)*450] #Midpoint of bin
-  j<-j+1
+
+NumberOfBins=BinLength/IntervalLength
+for(i in 0:round(nrow(Dataframe)/NumberOfBins)){
+    BinnedSpikePerSec[j]<-mean(SpikePerSec[(i*NumberOfBins)+1:((i+1)*NumberOfBins)], na.rm=TRUE)
+    SEMBinnedSpikePerSec[j]<-sd(SpikePerSec[(i*NumberOfBins)+1:((i+1)*NumberOfBins)],na.rm=TRUE)/sqrt(NumberOfBins)
+    TimeOfBin[j]<-Dataframe$TimeOfDay[(i+0.5)*NumberOfBins] #Midpoint of bin
+    j<-j+1
 }
 TimeOfBin<-as.POSIXct(TimeOfBin, origin="1970-01-01")
 BinnedDataframe<-data.frame(TimeOfBin, BinnedSpikePerSec, SEMBinnedSpikePerSec)
