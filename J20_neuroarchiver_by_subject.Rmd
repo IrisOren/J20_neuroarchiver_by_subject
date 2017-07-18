@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r initialisation, include=TRUE, echo = FALSE}
 AnimalIDCurrent<-"JF111"
 DataFile<-"~/Dropbox/ANALYSIS/J20_EEG_Manuscript/Output/SCPPDataframeAll.csv" #Ouput of J20_EEG_Manuscript.Rmd
-SpikesPCAFilenameControl<-"~/Dropbox/ANALYSIS/Neuroarchiver/J20EEG/SpikeDetectionMatthias/JF110/DataJF110/E9_detected_spikes_clustered.txt"
+SpikesPCAFilenameControl<-#"~/Dropbox/ANALYSIS/Neuroarchiver/J20EEG/SpikeDetectionMatthias/JF111/DataJF111/E9_detected_spikes_clustered.txt"
 SpikePCAFilenameDrug<-""
 ClustersToInclude<-c(0,4)  #Specify which clusters to include based on jupyter notebook classifiy_spikes_and_saveCalcClusters.ipynb
 TimeZone<-"Europe/london"
