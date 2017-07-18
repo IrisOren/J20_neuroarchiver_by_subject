@@ -89,7 +89,16 @@ Binning SpikeCount by hour
 
 ```{r BinnedSpikeCountByHour, include=TRUE, echo=FALSE}
 IntervalLength=8  #8s intervals analysed in neuroarchiver
-SpikePerSec<-Dataframe$SpikeCount/IntervalLength  #Spike count in interval
+SpikeCountToInclude<-c()
+#SpikeCountToInclude<-SpikeCountToInclude[!is.na(SpikeCountToInclude)]
+for(i in 1:nrow(Dataframe)){
+    if(Dataframe$ExcludeInterval[i]==1){
+      SpikeCountToInclude[i]=NA
+    }else{
+      SpikeCountToInclude[i]=Dataframe$SpikeCount[i]
+    }
+}
+SpikePerSec<-SpikeCountToInclude/IntervalLength  #Spike count in interval
 BinnedSpikePerSec<-c()
 TimeOfBin<-c()
 SEMBinnedSpikePerSec<-c()
