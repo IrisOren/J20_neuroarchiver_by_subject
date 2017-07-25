@@ -9,8 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r initialisation, include=TRUE, echo = FALSE}
-AnimalIDCurrent<-"JF105"
+```{r initialisation, include=FALSE, echo = FALSE}
+AnimalIDCurrent<-"JF106"
 DrugDateTime<-"29/06/15 08:30:00"
 Drug="DPZ"
 DataFile<-"~/Dropbox/ANALYSIS/J20_EEG_Manuscript/Output/SCPPDataframeAll.csv" #Ouput of J20_EEG_Manuscript.Rmd
@@ -32,8 +32,11 @@ library(dplyr)
 library(lazyeval) #Needed for using ggplot2 library
 library(ggplot2)
 library(grid)
+```
 
-#Import data and filter for animal
+
+Import data and filter for animal
+```{r ImportDataChunk, eval=TRUE, include=FALSE, echo = FALSE}
 Dataframe<-read.csv(DataFile)
 Dataframe<-filter(Dataframe, AnimalIDVariable==AnimalIDCurrent)
 Dataframe$TimeOfDay<-as.POSIXct(Dataframe$TimeOfDay)
@@ -67,7 +70,7 @@ LossIntervalPercentage<-NumberLossIntervals/nrow(DataframeOn)*100
 
 ```
 
-For periods when the transmitter was on, `r LossIntervalPercentage`% intervals had loss <20%
+For periods when the transmitter was on, `r LossIntervalPercentage`% intervals had loss >20%
 
 
 ###Filter out loss intervals
