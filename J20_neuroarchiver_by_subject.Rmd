@@ -10,8 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r initialisation, include=TRUE, echo = FALSE}
-AnimalIDCurrent<-"JF133"
-DrugDateTime<-"27/08/15 08:30:00"
+AnimalIDCurrent<-"JF105"
+DrugDateTime<-"29/06/15 08:30:00"
 Drug="DPZ"
 DataFile<-"~/Dropbox/ANALYSIS/J20_EEG_Manuscript/Output/SCPPDataframeAll.csv" #Ouput of J20_EEG_Manuscript.Rmd
 SpikesPCAFilenameControl<-#"~/Dropbox/ANALYSIS/Neuroarchiver/J20EEG/SpikeDetectionMatthias/JF133/DataJF133/E8_detected_spikes_clustered.txt"
@@ -50,12 +50,12 @@ DataLossOverTime
 ```
 ```{r LossQuantilesECDF, include = TRUE}
 #OPTIONAL: manually select dataframe rows when transmitter was on for quantifying the loss of the transmitter. This is determined from the Loss vs Time plot
-TransmitterOffTime<-Dataframe$InitialisedTime[10445]
-TransmitterOnTime<-Dataframe$InitialisedTime[32515]
-DataframeOn<-filter(Dataframe, InitialisedTime<TransmitterOffTime | InitialisedTime>TransmitterOnTime)
+#TransmitterOffTime<-Dataframe$InitialisedTime[10445]
+#TransmitterOnTime<-Dataframe$InitialisedTime[32515]
+#DataframeOn<-filter(Dataframe, #InitialisedTime<TransmitterOffTime | #InitialisedTime>TransmitterOnTime)
 
 #OR
-#DataframeOn<-Dataframe
+DataframeOn<-Dataframe
 ############
 
 LossECDF<-ecdf(DataframeOn$Loss)
@@ -67,7 +67,7 @@ LossIntervalPercentage<-NumberLossIntervals/nrow(DataframeOn)*100
 
 ```
 
-For periods when the transmitter was on, `r LossIntervalPercentage` intervals had loss <20%
+For periods when the transmitter was on, `r LossIntervalPercentage`% intervals had loss <20%
 
 
 ###Filter out loss intervals
@@ -184,7 +184,7 @@ SpikeCountHist
 ###Polar plotting of spikes identified by PCA analysis for control conditions
 
 Here, we use the output from the jupyter notebook for plotting circular plots and calculating phase coupling. This analysis does not take into account the number of intervals recorded/lost
-```{r PolarPCAHist, include=TRUE, echo=FALSE}
+```{r PolarPCAHist, eval=FALSE, echo=FALSE}
 SpikesPCA<-read.csv(SpikesPCAFilenameControl, header=FALSE, sep=" ")
 sps=512
 names(SpikesPCA)[1]<-"SampleNumber"
