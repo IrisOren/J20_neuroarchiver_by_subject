@@ -11,6 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r initialisation, include=TRUE, echo = FALSE}
 AnimalIDCurrent<-"JF133"
+DrugDateTime<-"27/08/15 08:30:00"
+Drug="DPZ"
 DataFile<-"~/Dropbox/ANALYSIS/J20_EEG_Manuscript/Output/SCPPDataframeAll.csv" #Ouput of J20_EEG_Manuscript.Rmd
 SpikesPCAFilenameControl<-#"~/Dropbox/ANALYSIS/Neuroarchiver/J20EEG/SpikeDetectionMatthias/JF133/DataJF133/E8_detected_spikes_clustered.txt"
 SpikePCAFilenameDrug<-""
@@ -21,6 +23,7 @@ num_files_to_plot<-4
 epoch_loss_threshold<-0.2 #Percentage of total epochs lost for displaying plot
 epoch_length<-8  #For calculating number of epochs per file
 NDF_length<-3600  #For calculating number of epochs per file
+
 
 
 #Load packages
@@ -125,6 +128,8 @@ for(i in 0:round(nrow(Dataframe)/NumberOfBins)){
 TimeOfBin<-as.POSIXct(TimeOfBin, origin="1970-01-01")
 BinnedDataframe<-data.frame(TimeOfBin, BinnedSpikePerSec, SEMBinnedSpikePerSec)
 
+DrugDateTimeLine=strptime(DrugDateTime, "%d/%m/%y %H:%M:%S") #Need as.numeric for ggplot to use in geom_vline and as.POSIXct for geom_text
+
 BinnedSpikeCountPlot<-ggplot(BinnedDataframe, aes(x=TimeOfBin, y=BinnedSpikePerSec))
 BinnedSpikeCountPlot <- BinnedSpikeCountPlot + 
   geom_point(na.rm=TRUE) +
@@ -132,7 +137,9 @@ BinnedSpikeCountPlot <- BinnedSpikeCountPlot +
   ylab(expression(paste("Mean Spike Rate (s"^{-1}*")"))) +
   theme_bw() +
   theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank()) 
+        panel.grid.minor = element_blank())+
+  geom_vline(xintercept = as.numeric(DrugDateTimeLine)) +
+  geom_text(aes(x=as.POSIXct(DrugDateTimeLine), y=(mean(BinnedDataframe$BinnedSpikePerSec, na.rm = TRUE)*1.5), label=Drug), angle=90, vjust=1.5)  #Position relative to mean of BinnedSpikePerSec
  
 
 BinnedSpikeCountPlot
