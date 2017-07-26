@@ -168,7 +168,7 @@ for(Hour in 0:23){
   DataframeTemp<-filter(DataframeSelect, HourOfEvent==Hour)
   TotalSpikeCount<-sum(DataframeTemp$SpikeCount)
   Total8sIntervals<-nrow(DataframeTemp)
-  TempDF<-data.frame(SpikeCount=TotalSpikeCount/Total8sIntervals*8, HourBin=Hour+0.5)
+  TempDF<-data.frame(SpikeCount=TotalSpikeCount/(Total8sIntervals*8), HourBin=Hour+0.5)
   SpikeCountHistDF<-rbind(SpikeCountHistDF, TempDF)
 }
 
