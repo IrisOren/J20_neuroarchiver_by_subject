@@ -10,15 +10,15 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r initialisation, include=FALSE, echo = FALSE}
-AnimalIDCurrent<-"JF152"
-DrugDateTime<-"25/10/15 20:00:00"
+AnimalIDCurrent<-"JF218"
+DrugDateTime<-NaN #No drug given 
 Drug="DPZ"
 DataFile<-"~/Dropbox/ANALYSIS/J20_EEG_Manuscript/Output/SCPPDataframeAll.csv" #Ouput of J20_EEG_Manuscript.Rmd
 SpikesPCAFilenameControl<-#"~/Dropbox/ANALYSIS/Neuroarchiver/J20EEG/SpikeDetectionMatthias/JF133/DataJF133/E8_detected_spikes_clustered.txt"
 SpikePCAFilenameDrug<-""
 ClustersToInclude<-c(0,4)  #Specify which clusters to include based on jupyter notebook classifiy_spikes_and_saveCalcClusters.ipynb
 TimeZone<-"Europe/london"
-Reference<-"CTX" #Reference electrode location
+Reference<-"CBLM" #Reference electrode location
 num_files_to_plot<-4
 epoch_loss_threshold<-0.2 #Percentage of total epochs lost for displaying plot
 epoch_length<-8  #For calculating number of epochs per file
@@ -53,20 +53,20 @@ DataLossOverTime
 ```
 ```{r LossQuantilesECDF, include = TRUE}
 
-#DataframeOn<-Dataframe
+DataframeOn<-Dataframe
 ############
 
 #OR: manually select dataframe rows when transmitter was on for quantifying the loss of the transmitter. This is determined from the Loss vs Time plot
-TransmitterOffTime<-"21/10/15 08:00:00" #format="%d/%m/%y %H:%M:%S"
-TransmitterOffTime<-min(which(Dataframe$TimeOfDay>as.POSIXct(strptime(TransmitterOffTime, "%d/%m/%y %H:%M:%S"))))
-TransmitterOffTime<-Dataframe$InitialisedTime[TransmitterOffTime]
+#TransmitterOffTime<-"21/10/15 08:00:00" #format="%d/%m/%y %H:%M:%S"
+#TransmitterOffTime<-min(which(Dataframe$TimeOfDay>as.POSIXct(strptime(TransmitterOffTime, "%d/%m/%y %H:%M:%S"))))
+#TransmitterOffTime<-Dataframe$InitialisedTime[TransmitterOffTime]
 
-TransmitterOnTime<-"23/10/15 12:00:00" #format="%d/%m/%y %H:%M:%S"
-TransmitterOnTime<-min(which(Dataframe$TimeOfDay>as.POSIXct(strptime(TransmitterOnTime, "%d/%m/%y %H:%M:%S"))))
-TransmitterOnTime<-Dataframe$InitialisedTime[TransmitterOnTime]
+#TransmitterOnTime<-"23/10/15 12:00:00" #format="%d/%m/%y %H:%M:%S"
+#TransmitterOnTime<-min(which(Dataframe$TimeOfDay>as.POSIXct(strptime(TransmitterOnTime, "%d/%m/%y %H:%M:%S"))))
+#TransmitterOnTime<-Dataframe$InitialisedTime[TransmitterOnTime]
 
 #Filter
-DataframeOn<-filter(Dataframe, InitialisedTime<TransmitterOffTime | InitialisedTime>TransmitterOnTime)
+#DataframeOn<-filter(Dataframe, InitialisedTime<TransmitterOffTime | InitialisedTime>TransmitterOnTime)
 
 
 
@@ -242,7 +242,7 @@ SpikesPCAHist
 
 ###Theta/delta and spikes in control conditions
 For animals with cerebellar reference, we can relate the theta/delta ratio to spikes. 
-```{r ThetaOverDeltaRawPlot, include=FALSE, echo=FALSE}
+```{r ThetaOverDeltaRawPlot, include=TRUE, echo=FALSE}
 AllNDFs_Control<-as.character(unique(DataframeControl$FileName)) 
 if(Reference=="CTX"){
   print("Cortical reference so no subthreshold parameters evaluated")
@@ -343,4 +343,29 @@ if(Reference=="CTX"){
                                                y=ThetaOverDelta))+geom_point()
   SpikeCountPlot
 }
+```
+
+
+```{r, ThetaOverDeltaBySpikeNumChunk, echo=FALSE, include=TRUE}
+
+if("plyr" %in% (.packages())){
+  detach("package:plyr", unload=TRUE)
+}
+  
+ThetaDeltaGrouped<-group_by(DataframeControl, SpikeCount)
+#Compute the mean spike rate for each animal in each behavioural state                     
+SummaryThetaDelta<-summarise(ThetaDeltaGrouped, MeanThetaDelta=mean(ThetaOverDelta))
+
+SummaryThetaDelta
+  
+ThetaDeltaSpikePlot<-ggplot(SummaryThetaDelta, 
+                            aes(x=SpikeCount,
+                                y=MeanThetaDelta)) +
+                            geom_line()+
+                            geom_point()
+
+ThetaDeltaSpikePlot
+
+
+
 ```
