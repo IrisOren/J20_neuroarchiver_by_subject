@@ -10,8 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r initialisation, include=FALSE, echo = FALSE}
-AnimalIDCurrent<-"JF106"
-DrugDateTime<-"29/06/15 08:30:00"
+AnimalIDCurrent<-"JF152"
+DrugDateTime<-"25/10/15 20:00:00"
 Drug="DPZ"
 DataFile<-"~/Dropbox/ANALYSIS/J20_EEG_Manuscript/Output/SCPPDataframeAll.csv" #Ouput of J20_EEG_Manuscript.Rmd
 SpikesPCAFilenameControl<-#"~/Dropbox/ANALYSIS/Neuroarchiver/J20EEG/SpikeDetectionMatthias/JF133/DataJF133/E8_detected_spikes_clustered.txt"
@@ -52,14 +52,23 @@ DataLossOverTime<-DataLossOverTime + geom_point() +
 DataLossOverTime
 ```
 ```{r LossQuantilesECDF, include = TRUE}
-#OPTIONAL: manually select dataframe rows when transmitter was on for quantifying the loss of the transmitter. This is determined from the Loss vs Time plot
-#TransmitterOffTime<-Dataframe$InitialisedTime[10445]
-#TransmitterOnTime<-Dataframe$InitialisedTime[32515]
-#DataframeOn<-filter(Dataframe, #InitialisedTime<TransmitterOffTime | #InitialisedTime>TransmitterOnTime)
 
-#OR
-DataframeOn<-Dataframe
+#DataframeOn<-Dataframe
 ############
+
+#OR: manually select dataframe rows when transmitter was on for quantifying the loss of the transmitter. This is determined from the Loss vs Time plot
+TransmitterOffTime<-"21/10/15 08:00:00" #format="%d/%m/%y %H:%M:%S"
+TransmitterOffTime<-min(which(Dataframe$TimeOfDay>as.POSIXct(strptime(TransmitterOffTime, "%d/%m/%y %H:%M:%S"))))
+TransmitterOffTime<-Dataframe$InitialisedTime[TransmitterOffTime]
+
+TransmitterOnTime<-"23/10/15 12:00:00" #format="%d/%m/%y %H:%M:%S"
+TransmitterOnTime<-min(which(Dataframe$TimeOfDay>as.POSIXct(strptime(TransmitterOnTime, "%d/%m/%y %H:%M:%S"))))
+TransmitterOnTime<-Dataframe$InitialisedTime[TransmitterOnTime]
+
+#Filter
+DataframeOn<-filter(Dataframe, InitialisedTime<TransmitterOffTime | InitialisedTime>TransmitterOnTime)
+
+
 
 LossECDF<-ecdf(DataframeOn$Loss)
 plot(LossECDF, xlab="Loss %", main="ECDF Loss")
