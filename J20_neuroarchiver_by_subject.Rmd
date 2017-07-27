@@ -1,7 +1,7 @@
 ---
 title: "J20 by subject analysis"
 author: "Iris Oren"
-date: "14/06/2017"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: html_document
 ---
 
@@ -51,22 +51,27 @@ DataLossOverTime<-DataLossOverTime + geom_point() +
   geom_hline(yintercept = 20)
 DataLossOverTime
 ```
+
+
 ```{r LossQuantilesECDF, include = TRUE}
 
-DataframeOn<-Dataframe
+#DataframeOn<-Dataframe
 ############
 
 #OR: manually select dataframe rows when transmitter was on for quantifying the loss of the transmitter. This is determined from the Loss vs Time plot
-#TransmitterOffTime<-"21/10/15 08:00:00" #format="%d/%m/%y %H:%M:%S"
-#TransmitterOffTime<-min(which(Dataframe$TimeOfDay>as.POSIXct(strptime(TransmitterOffTime, "%d/%m/%y %H:%M:%S"))))
-#TransmitterOffTime<-Dataframe$InitialisedTime[TransmitterOffTime]
 
-#TransmitterOnTime<-"23/10/15 12:00:00" #format="%d/%m/%y %H:%M:%S"
-#TransmitterOnTime<-min(which(Dataframe$TimeOfDay>as.POSIXct(strptime(TransmitterOnTime, "%d/%m/%y %H:%M:%S"))))
-#TransmitterOnTime<-Dataframe$InitialisedTime[TransmitterOnTime]
+#Here, For J0460 I exclude the last day where loss was high as this is the drug condition that won't be analysed
+
+TransmitterOffTime<-"24/05/17 00:00:00" #format="%d/%m/%y %H:%M:%S"
+TransmitterOffTime<-min(which(Dataframe$TimeOfDay>as.POSIXct(strptime(TransmitterOffTime, "%d/%m/%y %H:%M:%S"))))
+TransmitterOffTime<-Dataframe$InitialisedTime[TransmitterOffTime]
+
+TransmitterOnTime<-"25/05/17 24:00:00" #format="%d/%m/%y %H:%M:%S"
+TransmitterOnTime<-min(which(Dataframe$TimeOfDay>as.POSIXct(strptime(TransmitterOnTime, "%d/%m/%y %H:%M:%S"))))
+TransmitterOnTime<-Dataframe$InitialisedTime[TransmitterOnTime]
 
 #Filter
-#DataframeOn<-filter(Dataframe, InitialisedTime<TransmitterOffTime | InitialisedTime>TransmitterOnTime)
+DataframeOn<-filter(Dataframe, InitialisedTime<TransmitterOffTime | InitialisedTime>TransmitterOnTime)
 
 
 
